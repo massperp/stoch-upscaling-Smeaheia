@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as np
 from opm.io.ecl import EGrid
 from analytical_effective_perm import damage_zone_permeability
@@ -109,3 +110,6 @@ for aquifer in aquifers:
 
 h.write("/\n")
 h.close()
+
+
+#print(sum(vettevolumes), len(vettevolumes))
