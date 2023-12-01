@@ -46,6 +46,11 @@ for k_model_ind in range(len(k_model_order)):
         QoI_MC_3000 = np.loadtxt(path_QoI_MC3000)
         QoI_MC_hist = np.concatenate((QoI_MC_2000, QoI_MC_3000))
     
+        ######
+        path_QoI_MC500 = 'src/results/case_' + str(CaseId) + '/MC_Nsamples_500_kmod_' + str(k_model) + '.txt'
+        QoI_MC_hist = np.loadtxt(path_QoI_MC500)
+        ######
+            
         ax[CaseIndex].hist(QoI_MC_hist, bins=30, density=True, color="lightsteelblue")
 
         #print("Mean(QoI): ", np.mean(QoI_MC_hist))

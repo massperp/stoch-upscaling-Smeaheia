@@ -29,15 +29,17 @@ for k_model_ind in range(len(k_model_order)):
     
         if plot_ind == 0:
             data_samples_physical_all[plot_ind,:,:] = np.log10(np.exp(data_samples_physical_all[plot_ind,:,:]))
-        if plot_ind == 1 or plot_ind == 2:
-            data_samples_physical_all[plot_ind,:,:] = np.exp(data_samples_physical_all[plot_ind,:,:])
+        #if plot_ind == 1 or plot_ind == 2:
+        #    data_samples_physical_all[plot_ind,:,:] = np.exp(data_samples_physical_all[plot_ind,:,:])
 
         if plot_ind == 1 or plot_ind == 2:
             xlab = r'$s_{\rm d}$'
-            ax[plot_ind].plot(s_disc,data_samples_physical_all[plot_ind,:,:],'ko',markersize=1)
+            ax[plot_ind].plot(s_disc,np.exp(data_samples_physical_all[plot_ind,:,:]),'ko',markersize=1)
+            ax[plot_ind].plot(s_disc, np.mean(np.exp(data_samples_physical_all[plot_ind,:,:]),axis=1),'-r',markersize=1)
         else:
             xlab = r'$\log(s_{\rm d})$'
             ax[plot_ind].plot(np.log10(s_disc),data_samples_physical_all[plot_ind,:,:],'ko',markersize=1)
+            ax[plot_ind].plot(np.log10(s_disc),np.mean(data_samples_physical_all[plot_ind,:,:], axis=1),'-r',markersize=1)
 
         ax[plot_ind].set(xlabel = xlab, ylabel=labels_param[plot_ind])
 
