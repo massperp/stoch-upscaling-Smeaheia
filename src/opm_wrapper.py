@@ -170,10 +170,10 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
       
     if CaseId > 2:
 
-      K_copula, Pc_copula, S_copula, Kw_copula, Knw_copula = upscaled_Vette(pathName, xi[:,0:5], k_model_nr, s_disc_mod)
+      logK_copula, logPc_copula, logS_copula, logKw_copula, Knw_copula = upscaled_Vette(pathName, xi[:,0:5], k_model_nr, s_disc_mod)
             
       
-      copula_samples_physical = np.array([K_copula.T, Pc_copula.T, S_copula.T, Kw_copula.T, Knw_copula.T])
+      copula_samples_physical = np.array([np.exp(logK_copula).T, np.exp(logPc_copula).T, np.exp(logS_copula).T, np.exp(logKw_copula).T, Knw_copula.T])
       
       
     # Write tables and adjust data to OPM flow
@@ -183,7 +183,6 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
     level = 0 # grid level (0 is without refinements)
     
     Kb_aKm = -1.0  # no deformation bands
-    # Case 1
        
     if (CaseId == 1 or CaseId == 2):
       # Parameters for Vette permeability
@@ -194,7 +193,6 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
         ln_shape_Vette, ln_loc_Vette, ln_scale_Vette = 0.8594025002008879, 0.0, 0.2170569658583355
       
       if k_model_nr == 4:
-        # Vette
         ln_shape_Vette, ln_loc_Vette, ln_scale_Vette = 1.0661701511114192, 0.0, 0.04152786599598963
       
       if k_model_nr == 5:
@@ -204,7 +202,6 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
           
       K = np.tile(np.c_[K],(1,N_disc))
       
-    
       K_troll = K_Troll_mean
       
       

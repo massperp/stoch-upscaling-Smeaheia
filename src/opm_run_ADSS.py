@@ -1,3 +1,6 @@
+"""
+Script for running adaptive stratified sampling and standard Monte Carlo with OPM Flow.
+"""
 
 import sys
 import time
@@ -30,17 +33,11 @@ def repeated_runs(test_fun, N_dim, N_max, SR_const, alpha, stype, N_rep) -> Tupl
         stratification algorithm and the amounts of strata.
     """
 
-
     QoI_vec = np.zeros(N_rep)
     QoI_var_vec = np.zeros(N_rep)
     N_strat = np.zeros(N_rep, dtype='uint32')
-    #all_strata = np.zeros(N_rep)
-    # main loop to repeat adaptive stratification Nrep times
-    # rg = np.random.Generator(np.random.MT19937(42))
+
     for j_rep in range(N_rep):
-        # We use a rng with a seeded MT to enable reproducibility
-        # We need to put this in the loop, to get the same numbers.
-        # rg = np.random.Generator(np.random.MT19937(42))
         
         try:
             t_calculation = time.time()
@@ -49,7 +46,6 @@ def repeated_runs(test_fun, N_dim, N_max, SR_const, alpha, stype, N_rep) -> Tupl
                                                type_strat=stype, rand_gen=None)
             QoI_vec[j_rep], all_strata, N_strat[j_rep], QoI_var_vec[j_rep] = (
                 estimator.solve())  # solve_vis_steps(), solve_vis_result()
-            print("type(all_strata): ", type(all_strata))
             elapsed_calculation = time.time() - t_calculation
             print(f'Elapsed time is {elapsed_calculation} seconds for this run.')
         except (Exception):
@@ -73,24 +69,27 @@ if __name__ == "__main__":
     else:
         raise Exception('Please use hyperrect or simplex')
 
-    t = time.time()
+    #t = time.time()
 
     alpha = 0.5  # alpha: proportion of samples allocated optimally
-    N_max = int(300)  #int(1e3)  # numbers of max samples
+    N_max = int(500)  #int(1e3)  # numbers of max samples
     SR_const = 50  # increase per adaptation iteration
     
     CaseIds = [1,2,3,4,5,6]
-    k_models = [3,4] #[1,3] #, 3]
     
+    # The speedup estimates can be replaced by empirical estimates based on repeated sampling by setting number of repetitions N_rep > 1.
     N_rep = 1
-    for k_model_nr in k_models:
-        
     
-        pathName = "/home/AD.NORCERESEARCH.NO/pepe/adaptive-stratification-python/adaptive_stratification/examples/opm/stoch-upscaling-Smeaheia/copula_data/k_model_" + str(k_model_nr) + "/"
+    k_model_order = [4,3,1]
+    k_c = ['1e-4mD','1e-3mD', '1mD']
+
+    for k_model_ind in range(len(k_model_order)):
+        k_model_nr = k_model_order[k_model_ind]
+        print("SGR-perm model with k_c = ", k_c[k_model_ind])
         pathName = "copula_data/k_model_" + str(k_model_nr) + "/"
 
-    
         for CaseId in CaseIds:
+            # N_dim: number of uniform input random variables. Required for ADSS.
             if CaseId==1:
                 N_dim=1
             if CaseId==2:
@@ -107,15 +106,16 @@ if __name__ == "__main__":
            
             test_fun_part = functools.partial(test_fun, CaseId, k_model_nr, pathName)
             
+            # Standard Monte Carlo simulation
             MC_samp = test_fun_part(np.random.default_rng().uniform(0, 1, (N_max,N_dim)))
     
             fname = ('results/case_' + str(CaseId) + '/MC_Nsamples_' + str(N_max) +'_kmod_' + str(k_model_nr) + '.txt')
             if (not os.path.exists('results/case_' + str(CaseId) )):
                 os.makedirs('results/case_' + str(CaseId) )
             np.savetxt(fname, MC_samp, fmt="%s")
-            print('Done with case ', str(CaseId))
+            print('Finished SMC for case ', str(CaseId))
     
-
+            # Run adaptive stratified sampling
             (QoI_vec, QoI_var_vec, N_strat, all_strata) = repeated_runs(test_fun_part, N_dim, N_max, SR_const, alpha, stype, N_rep)
             
             fname = ('results/case_' + str(CaseId) + '/QoI_Nmax_' + str(N_max) +'_alpha_'+str(alpha)+'_kmod_' + str(k_model_nr) +'_rep_' + str(N_rep) + '.txt')
@@ -123,11 +123,11 @@ if __name__ == "__main__":
                 os.makedirs('results/case_' + str(CaseId) )
             np.savetxt(fname, QoI_vec, fmt="%s")
         
-            elapsed = time.time() - t
-            print(f'Total elapsed time is {elapsed} seconds.')
-            print('Done with case ', str(CaseId))
-
-    
+            #elapsed = time.time() - t
+            #print(f'Total elapsed time is {elapsed} seconds.')
+            print('Finished ADSS for case ', str(CaseId))
+            
+            # Print stratification results to file.
             p_all_strata = []
             N_all_strata = []
             pathN = "stratifications/strat_case_"+str(CaseId) + "_k" + str(k_model_nr) + "_N" + str(N_max)
