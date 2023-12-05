@@ -1,3 +1,7 @@
+"""
+Wrapper script to run Cases I-VI with OPM
+"""
+
 from mako.template import Template
 from joblib import Parallel, delayed
 import time
@@ -6,7 +10,6 @@ import sys
 import numpy as np
 from opm.io.ecl import ESmry
 import relperm as rp
-#import json
 from scipy.stats import lognorm
 from upscaled_flow_functions import upscaled_Vette_flow_functions as upscaled_Vette
 
@@ -54,10 +57,6 @@ def flow(samp_ind, K1, K2, Kb_aKm, perms, level):
 
   writePermeability(numXY[level], perms, samp_ind)
   
-  # Added by Per, 28 June -22:
- # os.system("mpirun -np 1 ~/simulators/opm/opm-simulators/build/bin/flow input/" + casename + ".DATA --output-dir=output > " + "output/" + casename + ".out")
-  #os.system("~/simulators/opm/opm-simulators/build/bin/flow input/" + casename + ".DATA --linear-solver-reduction=1e-3 --tolerance-cnv-relaxed=1 --output-dir=output > " + "output/" + casename + ".out")
-  # After IT installation of OPM and DUNE, 15/9 -23
   os.system("flow input/" + casename + ".DATA --linear-solver-reduction=1e-3 --tolerance-cnv-relaxed=1 --output-dir=output > " + "output/" + casename + ".out")
 
 def anqr(samp_ind):
@@ -134,7 +133,6 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
   set_n_jobs = 20
 
   n_samp, num_dim = np.shape(xi)
- 
   s_disc_mod = 'log'
 
   # Sample copula via inverse Rosenblatt
@@ -158,10 +156,6 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
         ln_shape, ln_loc, ln_scale = 1.4665525482014543, 0.0015096565275845822, 0.520655702642135
         K_Troll_mean = 1.867198573120268
     
-    if k_model_nr == 5:
-        # Parameters for Troll permeability
-        ln_shape, ln_loc, ln_scale = 1.6906038337738942, 9.190166659281564e-05, 0.1971889407917356
-        K_Troll_mean = 1.1641566417698446
         
     if (not os.path.exists("input")):
       os.mkdir("input")
@@ -172,9 +166,7 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
 
       logK_copula, logPc_copula, logS_copula, logKw_copula, Knw_copula = upscaled_Vette(pathName, xi[:,0:5], k_model_nr, s_disc_mod)
             
-      
       copula_samples_physical = np.array([np.exp(logK_copula).T, np.exp(logPc_copula).T, np.exp(logS_copula).T, np.exp(logKw_copula).T, Knw_copula.T])
-      
       
     # Write tables and adjust data to OPM flow
     ids = []
@@ -194,9 +186,6 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
       
       if k_model_nr == 4:
         ln_shape_Vette, ln_loc_Vette, ln_scale_Vette = 1.0661701511114192, 0.0, 0.04152786599598963
-      
-      if k_model_nr == 5:
-        ln_shape_Vette, ln_loc_Vette, ln_scale_Vette = 1.2748432937813292, 0.0, 0.0077272851459753295
         
       K = lognorm.isf(xi[:,0], s=ln_shape_Vette, loc=ln_loc_Vette, scale=ln_scale_Vette)
           
@@ -217,7 +206,7 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
         
      
       writeRelativePermeability(np.array([K, np.tile(Pc_mean,(n_samp,1)), np.tile(S_mean,(n_samp,1)), np.tile(Kw_mean,(n_samp,1)), np.tile(Knw_mean,(n_samp,1))]))
-      
+    # Case I
     if CaseId == 1:
       perms =[1000, 50, 1000, 50, 850, 25]
       for k1 in K:
@@ -225,6 +214,7 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
         ids.append(ind)
         ind = ind + 1
  
+    # Case II
     elif (CaseId == 2):
 
       # Means and std's of the six layer perms
@@ -242,7 +232,7 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
         ids.append(ind)
         ind = ind + 1
   
-    # Case 3
+    # Case III
     elif (CaseId == 3):
       K = copula_samples_physical[0]
       K_troll = K_Troll_mean
@@ -253,7 +243,7 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
         ids.append(ind)
         ind = ind + 1
  
-    # Case 4
+    # Case IV
     elif (CaseId == 4):
       K = copula_samples_physical[0]
       K_Troll_fitted_ln = lognorm.isf(xi[:,5], ln_shape, ln_loc, ln_scale)
@@ -266,7 +256,7 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
         ids.append(ind)
         ind = ind + 1
 
-    # Case 5
+    # Case V
     elif (CaseId == 5):
       K = copula_samples_physical[0]
       K_troll = K_Troll_mean
@@ -286,7 +276,7 @@ def opm_test_function(CaseId, k_model_nr, pathName, xi):
         ids.append(ind)
         ind = ind + 1
   
-    # Case 6
+    # Case VI
     elif (CaseId == 6):
       K = copula_samples_physical[0]
       # Means and std's of the six layer perms
