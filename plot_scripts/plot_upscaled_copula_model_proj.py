@@ -15,7 +15,8 @@ labels_param_fname = ['logPc','S','Kw','Knw']
 var_order = np.array([[1,0],[1,2],[1,3]])
 
 s_disc_mods = ['log', 'lin', 'log']
-font_size = 12
+font_size = 13
+plt.rcParams['savefig.dpi'] = 200
 
 k_model_order = [4,3,1]
 k_c = ['1e-4mD','1e-3mD', '1mD']
@@ -108,8 +109,6 @@ for k_model_ind in range(len(k_model_order)):
         else:
             ax1[row_ind*2].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
             ax1[row_ind*2+1].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        
-
 
         if row_ind < 2:
             # PDF plots
@@ -168,11 +167,6 @@ for k_model_ind in range(len(k_model_order)):
             ax2[1].set_xlim(xmin, xmax)
             ax2[1].set_ylim(ymin, ymax)
             
-            #ax2[1].set_xlim(start_x[row_ind], end_x[row_ind])
-            #ax2[1].set_ylim(start_y[row_ind], end_y[row_ind])
-            
-            
-            
             # Contourf plot
             cfset = ax2[1].contourf(xx, yy, f, cmap='Blues')
   
@@ -183,21 +177,11 @@ for k_model_ind in range(len(k_model_order)):
             
             ax2[1].plot(np.mean(x), np.mean(y ), 'rx', markersize=10)
             ax2[1].axis('tight')
-
-            #for ax_ind in ax2.flat:
-            #    ax_ind.set(xlabel = xlab, ylabel=ylab)
                 
             ax2[0].set_xlabel(xlab, fontsize=font_size)
             ax2[0].set_ylabel(ylab, fontsize=font_size)
             ax2[1].set_xlabel(xlab, fontsize=font_size)
 
-            #ax2[0].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            #ax2[1].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            
-            #ax2[0].xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            #ax2[1].xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            
-            #start_x, end_x = ax2[0].get_xlim()
             ax2[0].xaxis.set_ticks(x_ticks[row_ind])
             ax2[1].xaxis.set_ticks(x_ticks[row_ind])
             
@@ -207,7 +191,7 @@ for k_model_ind in range(len(k_model_order)):
             
             plt.setp(ax2[1].get_yticklabels(), visible=False)
                     
-            figname_PDF = 'figures/' + labels_param_fname[ind[1]] + '_vs_'+labels_param_fname[ind[0]] + '_local_pdf_kc_' + str(k_c[k_model_ind]) +'_'+ '.png'
+            figname_PDF = 'figures/' + labels_param_fname[ind[1]] + '_vs_'+labels_param_fname[ind[0]] + '_local_pdf_kc_' + str(k_c[k_model_ind]) +'_'+ '.pdf'
 
             plt.savefig(figname_PDF)
             

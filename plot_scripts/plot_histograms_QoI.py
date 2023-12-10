@@ -1,5 +1,5 @@
 """
-Generate histograms of CO2 leakage for the six test cases and SGR models described in [ref to paper].
+Generate histograms of CO2 leakage for the six test cases and SGR models described in "Copula modeling and uncertainty propagation in field-scale simulation of CO2 fault leakage".
 """
 import numpy as np
 import matplotlib
@@ -9,9 +9,9 @@ from matplotlib.ticker import FormatStrFormatter
 from matplotlib.ticker import LogLocator, AutoLocator
 from matplotlib import ticker
 
-
+# Change in fformat below to "%1.1f" if one decimal should be displayed.
 class OOMFormatter(matplotlib.ticker.ScalarFormatter):
-    def __init__(self, order=0, fformat="%1.1f", offset=True, mathText=True):
+    def __init__(self, order=0, fformat="%1.0f", offset=True, mathText=True):
         self.oom = order
         self.fformat = fformat
         matplotlib.ticker.ScalarFormatter.__init__(self,useOffset=offset,useMathText=mathText)
@@ -29,6 +29,10 @@ labels_case = ['I','II','III','IV','V','VI']
 k_model_order = [4,3,1]
 k_c = ['1e-4mD','1e-3mD', '1mD']
 
+font_size = 13
+plt.rcParams.update({'font.size': font_size})
+plt.rcParams['savefig.dpi'] = 400
+
 for k_model_ind in range(len(k_model_order)):
     k_model = k_model_order[k_model_ind]
 
@@ -38,6 +42,7 @@ for k_model_ind in range(len(k_model_order)):
 
     for CaseIndex in range(len(CaseOrder)):
 
+        # Two sets of SMC samples have been merged, no problem to generate the full set directly if one prefers.
         CaseId = CaseOrder[CaseIndex]
         path_QoI_MC2000 = 'results/case_' + str(CaseId) + '/MC_Nsamples_2000_kmod_' + str(k_model) + '.txt'
         path_QoI_MC3000 = 'results/case_' + str(CaseId) + '/MC_Nsamples_3000_kmod_' + str(k_model) + '.txt'
@@ -47,8 +52,8 @@ for k_model_ind in range(len(k_model_order)):
         QoI_MC_hist = np.concatenate((QoI_MC_2000, QoI_MC_3000))
     
         ######
-        path_QoI_MC500 = 'src/results/case_' + str(CaseId) + '/MC_Nsamples_500_kmod_' + str(k_model) + '.txt'
-        QoI_MC_hist = np.loadtxt(path_QoI_MC500)
+        #path_QoI_MC500 = 'src/results/case_' + str(CaseId) + '/MC_Nsamples_500_kmod_' + str(k_model) + '.txt'
+        #QoI_MC_hist = np.loadtxt(path_QoI_MC500)
         ######
             
         ax[CaseIndex].hist(QoI_MC_hist, bins=30, density=True, color="lightsteelblue")
@@ -56,7 +61,7 @@ for k_model_ind in range(len(k_model_order)):
         #print("Mean(QoI): ", np.mean(QoI_MC_hist))
     
         ax[CaseIndex].set(xlabel="Leaked CO$_2$ (kSm$^3$)")
-        ax[CaseIndex].set_title("Case " + labels_case[CaseIndex])
+        ax[CaseIndex].set_title("   Case " + labels_case[CaseIndex])
         ax[CaseIndex].margins(0.05)
         ax[CaseIndex].set_ylim(bottom=0)
         if k_model == 3:
@@ -70,8 +75,7 @@ for k_model_ind in range(len(k_model_order)):
         P90 = np.quantile(QoI_MC_hist, 0.9 , axis = None)
         P50 = np.quantile(QoI_MC_hist, 0.5 , axis = None)
         bottom, top = plt.ylim()
-        #ax[CaseIndex].vlines(x = [P10, np.mean(QoI_MC_hist), P90], ymin = bottom, ymax = top,
-        #       colors = 'red', ls='--')
+
         ax[CaseIndex].vlines(x = [P10, P50, P90], ymin = bottom, ymax = top,
            colors = 'red', ls='--')
     
@@ -86,17 +90,16 @@ for k_model_ind in range(len(k_model_order)):
         formatter.set_powerlimits((-1,1))
         ax[CaseIndex].yaxis.set_major_formatter(formatter)
     
-        #print("Prop <1e-6 leak", np.size( np.where( QoI_MC_hist < 1e-6 ),axis=1)/5000)
     
-        ax[CaseIndex].annotate("P10 = " + str(round(P10)), xy=(0.5, 0.8), xycoords='axes fraction')
-        ax[CaseIndex].annotate("P50 = " + str(round(P50)), xy=(0.5, 0.7), xycoords='axes fraction')
-        ax[CaseIndex].annotate("P90 = " + str(round(P90)), xy=(0.5, 0.6), xycoords='axes fraction')
+        ax[CaseIndex].annotate("P10 = " + str(round(P10)), xy=(0.5, 0.8), xycoords='axes fraction', fontsize=11)
+        ax[CaseIndex].annotate("P50 = " + str(round(P50)), xy=(0.5, 0.7), xycoords='axes fraction', fontsize=11)
+        ax[CaseIndex].annotate("P90 = " + str(round(P90)), xy=(0.5, 0.6), xycoords='axes fraction', fontsize=11)
 
     for axe in ax:
-        axe.yaxis.set_major_formatter(OOMFormatter(-3, "%1.1f"))
+        axe.yaxis.set_major_formatter(OOMFormatter(-3, "%1.0f"))
         axe.ticklabel_format(axis='y', style='sci', scilimits=(-3,-3))
-
+        #axe.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
     
-    figname = 'figures/QoI_MC_hist_kc_' + str(k_c[k_model_ind]) + '.png'
+    figname = 'figures/QoI_MC_hist_kc_' + str(k_c[k_model_ind]) + '.pdf'
     plt.savefig(figname)
 plt.show()

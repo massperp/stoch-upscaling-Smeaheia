@@ -11,6 +11,10 @@ labels_param = ['$\log(P_c)$ (Pa)','$S$','$K_{r}^{w}$','$K_{r}^{nw}$']
 k_model_order = [4,3,1]
 k_c = ['1e-4mD','1e-3mD', '1mD']
 
+font_size = 13
+plt.rcParams.update({'font.size': font_size})
+plt.rcParams['savefig.dpi'] = 200
+
 for k_model_ind in range(len(k_model_order)):
     k_model = 'k_model_' + str(k_model_order[k_model_ind])
     
@@ -18,8 +22,10 @@ for k_model_ind in range(len(k_model_order)):
 
     xlabs = [r'$\log(s_{\rm d})$',r'$s_{\rm d}$',r'$s_{\rm d}$',r'$s_{\rm d}$']
     fig, ax = plt.subplots(1,4, sharex=False, sharey=False, constrained_layout=True)
+    #ax = fig.add_subplot(111, rasterized=True)
     fig.set_size_inches(12.0, 3.0)
-    
+    #gca().set_rasterization_zorder(1)
+    #ax.set_rasterization_zorder(1);
     for plot_ind in range(4):
     
         xlab = xlabs[plot_ind]

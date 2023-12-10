@@ -8,6 +8,10 @@ from matplotlib.ticker import ScalarFormatter
 from matplotlib.ticker import LogLocator, AutoLocator, MultipleLocator, AutoMinorLocator
 from matplotlib import ticker
 
+
+font_size = 13
+plt.rcParams.update({'font.size': font_size})
+plt.rcParams['savefig.dpi'] = 300
    
 CaseOrder = [1,2,3,4,5,6]
 k_mods = [4,3,1]
@@ -75,11 +79,11 @@ for mod_ind in range(len(k_mods)):
     plt.xticks(N_maxs, x_labels)
     plt.xscale('log', subs=[2, 3, 4, 5, 6, 7, 8, 9])
     
-    ax[mod_ind].set_title(r'$k_{\rm c} = $' + str(kcs[mod_ind]) + ' mD')
+    ax[mod_ind].set_title(r'$k_{\rm c} = $' +' '+ str(kcs[mod_ind]) + ' mD')
     ax[mod_ind].set(xlabel = r'$N_{\rm s}$', ylabel = 'Speedup')
     
     ax[mod_ind].legend()
 
-figname = 'figures/Speedups_Case_I_VI.png'
+figname = 'figures/Speedups_Case_I_VI.pdf'
 plt.savefig(figname)
 plt.show()
