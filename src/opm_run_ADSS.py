@@ -1,5 +1,6 @@
 """
 Script for running adaptive stratified sampling and standard Monte Carlo with OPM Flow.
+The six test cases presented in "Copula modeling and uncertainty propagation in field-scale simulation of CO2 fault leakage" are defined in opm_wrapper.py. The user parameters alpha, N_max, and SR_const introduced below in main can be varied for, e.g., convergence studies
 """
 
 import sys
@@ -11,7 +12,6 @@ import os
 from adaptive_stratification.stratification import AdaptiveStratification
 from opm_wrapper import opm_test_function as test_fun
 import functools
-
 
 def repeated_runs(test_fun, N_dim, N_max, SR_const, alpha, stype, N_rep) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, int]:
     """Repeat stratification estimation N_rep times for reliability.
@@ -71,6 +71,7 @@ if __name__ == "__main__":
 
     #t = time.time()
 
+    # The user parameters alpha, N_max, and SR_const can be varied for, e.g., convergence studies
     alpha = 0.5  # alpha: proportion of samples allocated optimally
     N_max = int(500)  #int(1e3)  # numbers of max samples
     SR_const = 50  # increase per adaptation iteration
