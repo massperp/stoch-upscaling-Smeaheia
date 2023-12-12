@@ -1,7 +1,7 @@
 
 #  Stochastic upscaling for UP with OPM and ADSS
 Python framework for stochastic upscaling, copula modelling of upscaled flow functions, combined with forward uncertainty propagation (UP) using adaptive stratified sampling (ADSS) through the OPM reservoir simulator.
-This package contains scripts needed to reproduce the numerical results and relevant figures in **Copula modeling and uncertainty propagation in field-scale simulation of CO**$_2$ **fault leakage**.
+This package contains scripts needed to reproduce the numerical results and relevant figures in **Copula modeling and uncertainty propagation in field-scale simulation of CO**$_2$ **fault leakage** (https://arxiv.org/abs/2312.05851).
 
 
 
